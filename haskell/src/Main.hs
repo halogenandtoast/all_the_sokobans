@@ -56,9 +56,7 @@ isFilledStorage :: Level -> Coord -> Bool
 isFilledStorage level move = isStorage level move && isCrate level move
 
 loadLevel :: String -> IO Level
-loadLevel filename = do
-    levelData <- readFile filename
-    return $ levelFromString levelData
+loadLevel = (levelFromString <$>) . readFile
 
 levelFromString :: String -> Level
 levelFromString str =
@@ -81,11 +79,8 @@ levelFromString str =
 maxLengthOf :: String -> Int
 maxLengthOf = maximum . map length . lines
 
-flatten :: [[a]] -> [a]
-flatten = foldr (flip (foldr (:))) []
-
 zipWithCoords :: String -> [(Char, Coord)]
-zipWithCoords str = flatten $ zipWith zip (lines str) [[(x, y) | x <- [0..]] | y <- [0..]]
+zipWithCoords str = concat $ zipWith zip (lines str) [[(x, y) | x <- [0..]] | y <- [0..]]
 
 coordsOf :: Char -> [(Char, Coord)] -> [Coord]
 coordsOf c = map snd . filter ((== c) . fst)
