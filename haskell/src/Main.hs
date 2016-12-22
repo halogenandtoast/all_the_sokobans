@@ -1,4 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE MultiWayIf #-}
 module Main where
 
 import UI.NCurses
@@ -133,12 +134,12 @@ getMove = do
 
 performMove :: Level -> Move -> Level
 performMove level@Level{player} move =
-    case () of () | isWall level newPos -> level
-                  | isCrate level newPos ->
-                    if isWall level newPos' || isCrate level newPos'
-                       then level
-                       else moveCrate level' newPos newPos'
-                  | otherwise -> level'
+    if | isWall level newPos -> level
+       | isCrate level newPos ->
+         if isWall level newPos' || isCrate level newPos'
+            then level
+            else moveCrate level' newPos newPos'
+       | otherwise -> level'
   where
     newPos = moveCoord player move
     newPos' = moveCoord newPos move
