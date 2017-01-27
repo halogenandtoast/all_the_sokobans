@@ -108,10 +108,7 @@ notifyPlayer window level = do
     waitFor window (== EventCharacter 'q')
 
 renderLevel :: Level -> Update ()
-renderLevel level = do
-  clear
-  moveCursor 0 0
-  drawString $ show level
+renderLevel = (clear >>) . (moveCursor 0 0 >>) . drawString . show
 
 waitFor :: Window -> (Event -> Bool) -> Curses ()
 waitFor window predicate = loop
@@ -122,15 +119,19 @@ waitFor window predicate = loop
            Nothing -> loop
            Just event' -> unless (predicate event') loop
 
+charToMove :: Char -> Maybe Move
+charToMove 'k' = Just Up
+charToMove 'h' = Just Left
+charToMove 'j' = Just Down
+charToMove 'l' = Just Right
+charToMove _ = Nothing
+
 getMove :: IO Move
 getMove = do
     char <- getChar
-    case char of
-         'k' -> return Up
-         'h' -> return Left
-         'j' -> return Down
-         'l' -> return Right
-         _ -> getMove
+    case charToMove char of
+         Just x -> return x
+         Nothing -> getMove
 
 performMove :: Level -> Move -> Level
 performMove level@Level{player} move =
