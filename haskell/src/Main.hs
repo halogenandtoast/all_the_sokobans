@@ -39,19 +39,19 @@ symbolAt level coord
     | otherwise = ' '
 
 isPlayerOnStorage :: Level -> Coord -> Bool
-isPlayerOnStorage level move = isStorage level move && isPlayer level move
+isPlayerOnStorage level position = isStorage level position && isPlayer level position
 
 isPlayer :: Level -> Coord -> Bool
-isPlayer level@Level{player} = (== player)
+isPlayer Level{player} = (== player)
 
 isWall :: Level -> Coord -> Bool
-isWall level@Level{walls} = (`elem` walls)
+isWall Level{walls} = (`elem` walls)
 
 isStorage :: Level -> Coord -> Bool
-isStorage level@Level{storage} = (`elem` storage)
+isStorage Level{storage} = (`elem` storage)
 
 isCrate :: Level -> Coord -> Bool
-isCrate level@Level{crates} = (`elem` crates)
+isCrate Level{crates} = (`elem` crates)
 
 isFilledStorage :: Level -> Coord -> Bool
 isFilledStorage level move = isStorage level move && isCrate level move
@@ -97,7 +97,7 @@ runGameLoop window level = do
            else runGameLoop window level'
 
 hasWon :: Level -> Bool
-hasWon level@Level{storage, crates} = storage == crates
+hasWon Level{storage, crates} = storage == crates
 
 notifyPlayer :: Window -> Level -> Curses ()
 notifyPlayer window level = do
