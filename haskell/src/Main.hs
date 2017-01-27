@@ -4,7 +4,7 @@ module Main where
 
 import UI.NCurses
 import Control.Monad.IO.Class(liftIO)
-import Control.Monad(unless)
+import Control.Monad(unless, liftM2, ap)
 import System.Environment(getArgs)
 import Data.List(sort)
 import Prelude hiding (Either(..))
@@ -39,22 +39,22 @@ symbolAt level coord
     | otherwise = ' '
 
 isPlayerOnStorage :: Level -> Coord -> Bool
-isPlayerOnStorage level position = isStorage level position && isPlayer level position
+isPlayerOnStorage = ap (liftM2 (&&) . isStorage) isPlayer
 
 isPlayer :: Level -> Coord -> Bool
-isPlayer Level{player} = (== player)
+isPlayer = (==) . player
 
 isWall :: Level -> Coord -> Bool
-isWall Level{walls} = (`elem` walls)
+isWall = flip elem . walls
 
 isStorage :: Level -> Coord -> Bool
-isStorage Level{storage} = (`elem` storage)
+isStorage = flip elem . storage
 
 isCrate :: Level -> Coord -> Bool
-isCrate Level{crates} = (`elem` crates)
+isCrate = flip elem . crates
 
 isFilledStorage :: Level -> Coord -> Bool
-isFilledStorage level move = isStorage level move && isCrate level move
+isFilledStorage = ap (liftM2 (&&) . isStorage) isCrate
 
 loadLevel :: String -> IO Level
 loadLevel = (levelFromString <$>) . readFile
@@ -97,7 +97,7 @@ runGameLoop window level = do
            else runGameLoop window level'
 
 hasWon :: Level -> Bool
-hasWon Level{storage, crates} = storage == crates
+hasWon = liftM2 (==) storage crates
 
 notifyPlayer :: Window -> Level -> Curses ()
 notifyPlayer window level = do
